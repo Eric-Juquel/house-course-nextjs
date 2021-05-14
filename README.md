@@ -1,1 +1,1 @@
-# house-course-nextjs
+# Home Sweet Home
