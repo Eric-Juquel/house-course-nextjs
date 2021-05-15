@@ -71,8 +71,6 @@ function ReadySearchBox({ onSelectAddress, defaultValue }: ISearchBoxProps) {
     }
   };
 
-  console.log({ status, data });
-
   return (
     <Combobox onSelect={handleSelect}>
       <ComboboxInput
