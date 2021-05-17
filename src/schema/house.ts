@@ -15,6 +15,8 @@ import {
 import { Min, Max } from "class-validator";
 import { getBoundsOfDistance } from "geolib";
 import { Context, AuthorizedContext } from "./context";
+import { stringify } from "postcss";
+import { prisma } from "src/prisma";
 @InputType()
 class CoordinatesInput {
   @Min(-90)
@@ -157,5 +159,22 @@ export class HouseResolver {
         bedrooms: input.bedrooms,
       },
     });
+  }
+
+  @Authorized()
+  @Mutation((_returns) => Boolean, { nullable: false })
+  async deleteHouse(
+    @Arg("id") id: string,
+    @Ctx() ctx: AuthorizedContext
+  ): Promise<boolean> {
+    const houseId = parseInt(id, 10);
+    const house = await prisma.house.findOne({ where: { id: houseId } });
+
+    if (!house || house.userId !== ctx.uid) return false;
+
+    await ctx.prisma.house.delete({
+      where: { id: houseId },
+    });
+    return true;
   }
 }
