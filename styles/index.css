@@ -23,6 +23,19 @@ input {
   border-radius: 5px;
 }
 
+/* Chrome */
+::-webkit-scrollbar {
+  height: 5px;
+  width: 5px;
+  background: black;
+}
+
+::-webkit-scrollbar-thumb {
+  background: orange;
+  border-radius: 1ex;
+  -webkit-border-radius: 1ex;
+}
+
 /* Custom Classes */
 
 .marker-active {

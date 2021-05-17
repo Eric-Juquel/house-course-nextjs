@@ -24,7 +24,7 @@ export default function SingleMap({ house, nearby }: IProps) {
 
   return (
     <>
-      <div className="w-full h-12 mx-auto  flex items-center justify-evenly">
+      <div className="w-1/2 h-12 mx-auto  flex items-center justify-evenly">
         <div className="flex items-center m-auto">
           <input
             id="radio1"

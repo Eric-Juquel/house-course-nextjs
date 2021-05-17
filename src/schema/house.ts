@@ -29,6 +29,15 @@ class CoordinatesInput {
 }
 
 @InputType()
+class BoundsInput {
+  @Field((_type) => CoordinatesInput)
+  sw!: CoordinatesInput;
+
+  @Field((_type) => CoordinatesInput)
+  ne!: CoordinatesInput;
+}
+
+@InputType()
 class HouseInput {
   @Field((_type) => String)
   address!: string;
@@ -97,6 +106,17 @@ export class HouseResolver {
     return ctx.prisma.house.findOne({ where: { id: parseInt(id, 10) } });
   }
 
+  @Query((_returns) => [House], { nullable: false })
+  async houses(@Arg("bounds") bounds: BoundsInput, @Ctx() ctx: Context) {
+    return ctx.prisma.house.findMany({
+      where: {
+        latitude: { gte: bounds.sw.latitude, lte: bounds.ne.latitude },
+        longitude: { gte: bounds.sw.longitude, lte: bounds.ne.longitude },
+      },
+      take: 50,
+    });
+  }
+
   @Authorized()
   @Mutation((_returns) => House, { nullable: true })
   async createHouse(
@@ -106,6 +126,30 @@ export class HouseResolver {
     return await ctx.prisma.house.create({
       data: {
         userId: ctx.uid,
+        image: input.image,
+        address: input.address,
+        latitude: input.coordinates.latitude,
+        longitude: input.coordinates.longitude,
+        bedrooms: input.bedrooms,
+      },
+    });
+  }
+
+  @Authorized()
+  @Mutation((_returns) => House, { nullable: true })
+  async updateHouse(
+    @Arg("id") id: string,
+    @Arg("input") input: HouseInput,
+    @Ctx() ctx: AuthorizedContext
+  ) {
+    const houseId = parseInt(id, 10);
+    const house = await ctx.prisma.house.findOne({ where: { id: houseId } });
+
+    if (!house || house.userId !== ctx.uid) return null;
+
+    return await ctx.prisma.house.update({
+      where: { id: houseId },
+      data: {
         image: input.image,
         address: input.address,
         latitude: input.coordinates.latitude,
